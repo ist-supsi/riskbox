@@ -2,7 +2,7 @@
 Collection of GRASS modules to accomplish risk assesment and evaluation developed in the past years at the Geospatial Division in SUPSI (University of Applied Sciences and Arts of Southern Switzerland).
 
 ## modules
-
+* TRIGRS: python scripts to run the TRIGRS model for Shallow landslide vulnerability assessment within GRASS
 * r.conefall: module for fast estimation of rock fall hazard
 * r.damflood: module to estimate the flooding due to dam failure (use shallow water equations)
 * r.dfwalk/r.dfwalk_v2: module to estimate debris flow hazard using a random walk approach
