@@ -1,0 +1,277 @@
+#!/usr/bin/python
+# -*- coding:utf-8 -*-
+############################################################################
+#
+# MODULE:       r.hazard.class
+#
+# AUTHOR(S):    M. Molinari,M. Cannata (IST-SUPSI, http://istgeo.ist.supsi.ch)
+#
+# PURPOSE:      Classification of flooded area maps by hazard
+#
+# COPYRIGHT:    (c) 2007 The GRASS Development Team
+#
+#               This program is free software under the GNU General Public
+#               License (>=v2). Read the file COPYING that comes with GRASS
+#               for details.
+#
+############################################################################
+#%Module
+#%  description: Hazard classification of area maps
+#%  keywords: hazard, classification
+#%End
+#%Flag
+#% key: c
+#% description: set color maps
+#%End
+#%Flag
+#% key: s
+#% description: cautelative mode
+#%End
+#%option
+#%  key: low_int
+#%  type: string
+#%  gisprompt: old,cell,raster
+#%  description: Intensity map calculated with low Return Period
+#%  required : yes
+#%end
+#%option
+#%  key: med_int
+#%  type: string
+#%  gisprompt: old,cell,raster
+#%  description: Intensity map calculated with medium Return Period
+#%  required : yes
+#%end
+#%option
+#%  key: high_int
+#%  type: string
+#%  gisprompt: old,cell,raster
+#%  description: Intensity map calculated with high Return Period
+#%  required : yes
+#%end
+#%option
+#%  key: low_ub
+#%  type: integer
+#%  description: Lower intensity class upper boundary value
+#%  required : yes
+#%end
+#%option
+#%  key: med_ub
+#%  type: integer
+#%  description: Medium intensity class upper boundary value
+#%  required : yes
+#%end
+#%option
+#%  key: l_class
+#%  type: string
+#%  gisprompt: new,cell,raster
+#%  description: Low return period hazard map classification
+#%  required : yes
+#%end
+#%option
+#%  key: m_class
+#%  type: string
+#%  gisprompt: new,cell,raster
+#%  description: Medium return period hazard map classification
+#%  required : yes
+#%end
+#%option
+#%  key: h_class
+#%  type: string
+#%  gisprompt: new,cell,raster
+#%  description: High return period hazard map classification
+#%  required : yes
+#%end
+#%option
+#%  key: t_class
+#%  type: string
+#%  gisprompt: new,cell,raster
+#%  description: Total hazard map classification
+#%  required : yes
+#%end
+
+
+import os,sys,subprocess,string,random,math,tempfile,time,re
+
+def main(): 
+
+    #### get inputs ####
+    map1 = os.getenv('GIS_OPT_low_int')
+    map2 = os.getenv('GIS_OPT_med_int')
+    map3 = os.getenv('GIS_OPT_high_int')
+    I_min = int(os.getenv('GIS_OPT_low_ub'))
+    I_med = int(os.getenv('GIS_OPT_med_ub'))
+    output1 = os.getenv('GIS_OPT_l_class')
+    output2 = os.getenv('GIS_OPT_m_class')
+    output3 = os.getenv('GIS_OPT_h_class')
+    output4 = os.getenv('GIS_OPT_t_class')
+    c = os.getenv('GIS_FLAG_c')
+    s = os.getenv('GIS_FLAG_s')
+
+    #### setup temporary file ####    
+    p=re.compile('\W')  
+    lrp = p.sub("",tempfile.mktemp())
+    mrp1 = p.sub("",tempfile.mktemp())
+    mrp2 = p.sub("",tempfile.mktemp())
+    hrp = p.sub("",tempfile.mktemp())
+    hrp1 = p.sub("",tempfile.mktemp())
+    tot = p.sub("",tempfile.mktemp())
+    tot1 = p.sub("",tempfile.mktemp())
+    tot2 = p.sub("",tempfile.mktemp())
+    cf = p.sub("",tempfile.mktemp())
+    cat = p.sub("",tempfile.mktemp())
+
+
+    ### get env variables and temporary path ###
+    #cmdargs00=["g.gisenv"]
+    #proc00 = subprocess.Popen(cmdargs00, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    #array = proc00.communicate()[0].split("\n")
+    #gisdbase = array[0].split("=")[1].strip('\'\";')
+    #mapset = array[1].split("=")[1].strip('\'\";')
+    #location = array[2].split("=")[1].strip('\'\";')
+    #tmppath = gisdbase + "/" + location + "/" + mapset +  "/.tmp/"
+    tmppath ='/tmp/'
+
+    if ('%s'%s=='0'):
+     
+        ### Low Return Period ###
+        cmdargs1=["%s=if(%s>0 && %s<=%s,1000,%s)"%(lrp,map1,map1,I_med,map1)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs1)
+    
+        cmdargs2=["%s=if(%s>%s,10000,%s)"%(output1,map1,I_med,lrp)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs2)
+    
+        ### Medium Return Period ###
+        cmdargs4=["%s=if(%s>0 && %s<=%s,1,%s)"%(mrp1,map2,map2,I_min,map2)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs4)
+    
+        cmdargs5=["%s=if(%s>%s && %s<=%s,1000,%s)"%(mrp2,map2,I_min,map2,I_med,mrp1)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs5)
+
+        cmdargs6=["%s=if(%s>%s,10000,%s)"%(output2,map2,I_med,mrp2)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs6)
+
+        ### High Return Period ###
+        cmdargs8=["%s=if(%s>0 && %s<=%s,1,%s)"%(hrp,map3,map3,I_med,map3)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs8)
+
+        cmdargs9=["%s=if(%s>%s,10000,%s)"%(output3,map3,I_med,hrp)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs9)
+
+    else:
+
+        ### Low Return Period ###
+        cmdargs1=["%s=if(%s>0 && %s<=%s,1000,%s)"%(lrp,map1,map1,I_min,map1)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs1)
+
+        cmdargs2=["%s=if(%s>%s,10000,%s)"%(output1,map1,I_min,lrp)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs2)
+
+        ### Medium Return Period ###
+        cmdargs3=["%s=if(%s>0 && %s<=%s,1000,%s)"%(mrp1,map2,map2,I_med,map2)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs3)
+
+        cmdargs4=["%s=if(%s>%s,10000,%s)"%(output2,map2,I_med,mrp1)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs4)
+
+        ### High Return Period ###
+        cmdargs5=["%s=if(%s>0 && %s<=%s,1,%s)"%(hrp,map3,map3,I_min,map3)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs5)
+    
+        cmdargs6=["%s=if(%s>%s && %s<=%s,1000,%s)"%(hrp1,map3,I_min,map3,I_med,hrp)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs6)
+
+        cmdargs7=["%s=if(%s>%s,10000,%s)"%(output3,map3,I_med,hrp1)]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs7)
+
+
+    ### Final hazard Map ###
+    cmdargs10=["%s=%s+%s+%s"%(tot,output1,output2,output3)]
+    os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs10)
+
+    cmdargs11=["%s=if(%s>0 && %s<=3,1,%s)"%(tot1,tot,tot,tot)]
+    os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs11) 
+    
+    cmdargs12=["%s=if(%s>=1000 && %s<=3000,2,%s)"%(tot2,tot,tot,tot1)]
+    os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs12)
+
+    cmdargs13=["%s=int(if(%s>=10000,3,%s))"%(output4,tot,tot2)]
+    os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs13)
+
+    ### Standardize categories ###
+    cmdargs14=["%s=int(if(%s==1000,2,if(%s==10000,3,%s)))"%(output1,output1,output1,output1)]
+    os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs14)
+
+    cmdargs15=["%s=int(if(%s==1000,2,if(%s==10000,3,%s)))"%(output2,output2,output2,output2)]
+    os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs15)
+
+    cmdargs16=["%s=int(if(%s==1000,2,if(%s==10000,3,%s)))"%(output3,output3,output3,output3)]
+    os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs16)
+
+
+   ### Set hazard categories with rules file ###
+    fol=open(tmppath+cat,"w")
+    fol.write('0:null\n')
+    fol.write('1:low\n')
+    fol.write('2:medium\n')
+    fol.write('3:high\n')
+    fol.close()
+
+    cmdargs17=["map=%s"%output1,"rules=%s"%(tmppath+cat)]
+    os.spawnvp(os.P_WAIT,"r.category", ["r.category"] + cmdargs17)   
+
+    cmdargs18=["map=%s"%output2,"rules=%s"%(tmppath+cat)]
+    os.spawnvp(os.P_WAIT,"r.category", ["r.category"] + cmdargs18) 
+
+    cmdargs19=["map=%s"%output3,"rules=%s"%(tmppath+cat)]
+    os.spawnvp(os.P_WAIT,"r.category", ["r.category"] + cmdargs19) 
+
+    cmdargs20=["map=%s"%output4,"rules=%s"%(tmppath+cat)]
+    os.spawnvp(os.P_WAIT,"r.category", ["r.category"] + cmdargs20) 
+
+
+   ### Set color map ###
+    if ('%s'%c=='1'):
+        # create temp rule files #
+        fom=open(tmppath+cf,"w")
+        fom.write('0 white\n')
+        fom.write('1 yellow\n')
+        fom.write('2 blue\n')
+        fom.write('3 red\n')
+        fom.close()
+
+        # set colors with rule files #
+        cmdargs3=["map=%s"%output1,"rules=%s"%(tmppath+cf),"--q"]
+        os.spawnvp(os.P_WAIT,"r.colors", ["r.colors"] + cmdargs3)
+
+        cmdargs7=["map=%s"%output2,"rules=%s"%(tmppath+cf),"--q"]
+        os.spawnvp(os.P_WAIT,"r.colors", ["r.colors"] + cmdargs7)
+
+        cmdargs10=["map=%s"%output3,"rules=%s"%(tmppath+cf),"--q"]
+        os.spawnvp(os.P_WAIT,"r.colors", ["r.colors"] + cmdargs10)    
+
+        cmdargs14=["map=%s"%output4,"rules=%s"%(tmppath+cf),"--q"]
+        os.spawnvp(os.P_WAIT,"r.colors", ["r.colors"] + cmdargs14)
+
+
+    ### Remove Temporary File ###
+    if('%s'%s=='0'):
+        cmdargs18=["rast=%s,%s,%s,%s,%s,%s,%s"%(lrp,mrp1,mrp2,hrp,tot,tot1,tot2),"--q"]
+        os.spawnvp(os.P_WAIT,"g.remove", ["g.remove"] + cmdargs18)
+    else:
+        cmdargs18=["rast=%s,%s,%s,%s,%s,%s,%s"%(lrp,mrp1,hrp,hrp1,tot,tot1,tot2),"--q"]
+        os.spawnvp(os.P_WAIT,"g.remove", ["g.remove"] + cmdargs18)        
+   
+    cmdargs19=["%s"%(tmppath+cat)]
+    os.spawnvp(os.P_WAIT,"rm", ["rm"] + cmdargs19)
+   
+    if ('%s'%c=='1'):
+        cmdargs22=["%s"%(tmppath+cf)]
+        os.spawnvp(os.P_WAIT,"rm", ["rm"] + cmdargs22)
+
+    return
+
+if __name__ == "__main__":
+    if ( len(sys.argv) <= 1 or sys.argv[1] != "@ARGS_PARSED@" ):
+        os.execvp("g.parser", [sys.argv[0]] + sys.argv)
+    else:
+	main();

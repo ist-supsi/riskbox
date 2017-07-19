@@ -1,0 +1,247 @@
+#  Note:fed694c2 - This file not intended for hand editing.
+#  Absoft Developer Tools Interface requires use of this makefile.
+#  Use the Generate Makefile command to customize your own makefiles.
+#
+#  Absoft Corporation Compiler Interface Makefile(v4.0.1).
+#
+#
+#  Type 'amake -f "TopoIndex.amk"' in this directory at the Terminal.app prompt
+#  to execute this makefile. Type 'amake -f "TopoIndex.amk" clean' to
+#  remove old *.o, *.out, and any other project related files.
+#
+#
+#  This file was created by Absoft Developer Tools Interface.
+#  File created on: Tue May 27 14:59:07 2008
+#
+#
+
+
+
+#
+#  Variables and flags for the compiler(s) and linker.
+#
+F95COMPILER= f95
+F77COMPILER= f77
+C_COMPILER=  gcc
+CPPCOMPILER= c++
+LINKER=      c++
+
+F9x_FLAGS=   -O -B18 -O2 -c -nowdir -s -Rb -YEXT_NAMES=ASIS 
+F77_FLAGS=   -O -B18 -O2 -c -s -C 
+FF95_FLAG=   
+F_DEFINES=   
+C_FLAGS=     
+CPP_FLAGS=   -x c++
+C_DEFINES=   
+C_UNDEFS=    
+
+
+
+DFLT_LNK_FLG=
+USER_LNK_FLG=-Xlinker -w -Xlinker -Y -Xlinker 10 
+LNK_FLAGS=   $(DFLT_LNK_FLG) $(USER_LNK_FLG)
+
+BASENAME=    TopoIndex
+#
+#  Name of the executable.
+#
+TARGET=      TopoIndex.out
+OUTDIR=      .
+OBJDIR=      ./build
+
+#
+#  Files for this executable.
+#
+F95FILES=    "./tpindx.f90" "./nxtcel.f90" 
+MODFILES=    
+FFILES=      "./isvgrd.f" "./mpfldr.f" "./rdflodir.f" "./sindex.f"  \
+            "./slofac.f" "./srdgrd1.f" 
+CFILES=      
+RCFILES=     
+RESFILES=    
+PLISTFILES=  
+HFILES=      
+OBJS=        
+FRAMEWORKS=  
+OTHERFILES=  
+MKFILE=      ./TopoIndex.amk
+
+#
+#  Libraries for this executable.
+#
+USER_LIBS=   
+DFLT_LIBS=   "/Applications/Absoft/lib/objcinit_stub.o" "/Applications/Absoft/lib/carbon_stub.o"  \
+            -L"/Applications/Absoft/lib" -lf90math -lfio -lf77math -lm 
+LIBS=        $(USER_LIBS) $(DFLT_LIBS) $(FRAMEWORKS)
+
+
+
+#
+#  Include directories specified for this executable.
+#
+INCS=        
+LPATHS=      
+
+
+
+#
+#  Module flags, files and directories specified for this executable.
+#
+MOD_FLAGS=   
+MOD_INCS=    
+
+
+
+#  The following macro(s) and rule(s) are required for a full build
+#
+#  Rules and dependencies for the executable.
+#
+SRCFILES=    $(FFILES) $(F90FILES) $(CFILES) $(HFILES) $(RCFILES) $(RESFILES) $(OTHERFILES)
+RCRSFILES=   $(RESFILES) 
+
+OBJFILES=    $(OBJS) "$(OBJDIR)/tpindx.o" "$(OBJDIR)/nxtcel.o" "$(OBJDIR)/isvgrd.o" "$(OBJDIR)/mpfldr.o"  \
+            "$(OBJDIR)/rdflodir.o" "$(OBJDIR)/sindex.o"  \
+            "$(OBJDIR)/slofac.o" "$(OBJDIR)/srdgrd1.o" 
+
+#
+#  Optional macros, rules and dependencies included from prebuild file.
+#
+
+
+#
+#  Default dependency for this makefile
+#
+default: "$(OUTDIR)/$(TARGET)"
+
+all: "$(OUTDIR)/$(TARGET)"
+
+
+"$(OUTDIR)/$(TARGET)": "$(OUTDIR)" "$(OBJDIR)" "$(MKFILE)" $(OBJFILES) $(RCRSFILES)\
+	$(USER_LIBS) $(MODFILES)
+	$(LINKER) $(LPATHS) $(OBJFILES) $(LNK_FLAGS) $(LIBS) \
+		-o "$(OUTDIR)/$(TARGET)"
+#
+#  Optional commands, macros, rules and dependencies from postbuild file.
+#
+#  To append additional commands to the default target dependency 
+#  begin the first line of the postbuild file with a tab.
+#
+
+
+.r.rsrc:
+	$(MKDIR) -p "$(APPDIR)/$(REZDIR)"
+	touch "$(APPDIR)/$(REZDIR)"
+	$(RC) -o "$(APPDIR)/$(REZDIR)/$(BASENAME).rsrc" $(RCFLAGS) $<
+
+
+"$(OBJDIR)" :
+	if [ ! -e "$(OBJDIR)" ]; then $(MKDIR) "$(OBJDIR)" ; fi
+
+
+"$(OUTDIR)" :
+
+
+"$(APPDIR)/$(REZDIR)" :
+	$(MKDIR) -p "$(APPDIR)/$(REZDIR)"
+
+
+qclean: clean_exe clean_misc clean_plugins
+	rm -f "$(OBJDIR)"/*.mod
+	rm -f "$(OBJDIR)"/*.rsrc
+	rm -f "$(OBJDIR)"/*.a
+	rm -f "$(OBJDIR)"/*.o
+
+cleanProjFiles: clean
+
+clean: clean_f95 clean_f77 clean_acc clean_target
+
+clean_misc:
+	rm -f "$(OBJDIR)"/*.amh
+	rm -f "$(OBJDIR)"/*.bif
+	rm -f "$(OBJDIR)"/*.int
+	rm -f "$(OUTDIR)"/*.amh
+	rm -f "$(OUTDIR)"/*.bif
+	rm -f "$(OUTDIR)"/*.int
+
+clean_f95: clean_f95src clean_f95mods
+
+clean_target: clean_misc clean_plugins clean_rsrc clean_exe
+
+clean_exe:
+	rm -f "$(OUTDIR)/$(TARGET)"
+
+clean_rsrc:
+
+clean_f95src:
+	rm -f "$(OBJDIR)/tpindx.o"
+	rm -f "$(OBJDIR)/nxtcel.o"
+
+clean_f77:
+	rm -f "$(OBJDIR)/isvgrd.o"
+	rm -f "$(OBJDIR)/mpfldr.o"
+	rm -f "$(OBJDIR)/rdflodir.o"
+	rm -f "$(OBJDIR)/sindex.o"
+	rm -f "$(OBJDIR)/slofac.o"
+	rm -f "$(OBJDIR)/srdgrd1.o"
+
+clean_acc:
+
+clean_plugins:
+
+clean_f95mods:
+
+
+TPINDX_F90_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/tpindx.o": "./tpindx.f90"
+	$(F95COMPILER) -o "$(OBJDIR)/tpindx.o" $(TPINDX_F90_11)  "./tpindx.f90"
+
+
+NXTCEL_F90_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/nxtcel.o": "./nxtcel.f90"
+	$(F95COMPILER) -o "$(OBJDIR)/nxtcel.o" $(NXTCEL_F90_11)  "./nxtcel.f90"
+
+
+ISVGRD_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/isvgrd.o": "./isvgrd.f"
+	$(F77COMPILER) -o "$(OBJDIR)/isvgrd.o" $(ISVGRD_F_11)  "./isvgrd.f"
+
+
+MPFLDR_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/mpfldr.o": "./mpfldr.f"
+	$(F77COMPILER) -o "$(OBJDIR)/mpfldr.o" $(MPFLDR_F_11)  "./mpfldr.f"
+
+
+RDFLODIR_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/rdflodir.o": "./rdflodir.f"
+	$(F77COMPILER) -o "$(OBJDIR)/rdflodir.o" $(RDFLODIR_F_11)  "./rdflodir.f"
+
+
+SINDEX_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/sindex.o": "./sindex.f"
+	$(F77COMPILER) -o "$(OBJDIR)/sindex.o" $(SINDEX_F_11)  "./sindex.f"
+
+
+SLOFAC_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/slofac.o": "./slofac.f"
+	$(F77COMPILER) -o "$(OBJDIR)/slofac.o" $(SLOFAC_F_11)  "./slofac.f"
+
+
+SRDGRD1_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/srdgrd1.o": "./srdgrd1.f"
+	$(F77COMPILER) -o "$(OBJDIR)/srdgrd1.o" $(SRDGRD1_F_11)  "./srdgrd1.f"
+
+
+
+
+#
+#  Include any scanned dependencies
+#
+include "$(OUTDIR)/mkdep/mkdep_$(BASENAME).amk"
+
+
+#
+#  Define necessary macros for dependency scanning.
+#
+MKDEP=       makedepend
+MKDEP_FLAGS= -quiet "-pre$(OBJDIR)/" -Y -modInfo -errdel 
+

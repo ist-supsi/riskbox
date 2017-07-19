@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>GRASS GIS: r.dfwalk</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="grassdocs.css" type="text/css">
+</head>
+<body bgcolor="white">
+
+<img src="grass_logo.png" alt="GRASS logo"><hr align=center size=6 noshade>
+
+<h2>NAME</h2>
+<em><b>r.dfwalk</b></em>  - Calculate debris-flow hazard map
+<h2>KEYWORDS</h2>
+raster, debris-flow, hazard
+<h2>SYNOPSIS</h2>
+<b>r.dfwalk</b><br>
+<b>r.dfwalk help</b><br>
+<b>r.dfwalk</b> [-<b>qm</b>] <b>dsm</b>=<em>name</em> <b>start</b>=<em>name</em>  [<b>pdir</b>=<em>name</em>]   [<b>slim</b>=<em>float</em>]   [<b>esp</b>=<em>float</em>]   [<b>nrw</b>=<em>integer</em>]   [<b>smean</b>=<em>float</em>]   [<b>pmd</b>=<em>float</em>]   [<b>ps</b>=<em>float</em>]   [<b>vl</b>=<em>float</em>]   [<b>sl</b>=<em>float</em>]   [<b>shm</b>=<em>float</em>]   [<b>vhm</b>=<em>float</em>]   [<b>sh0m</b>=<em>float</em>]  <b>nrrw</b>=<em>name</em> <b>vel</b>=<em>name</em> <b>hgt</b>=<em>name</em>  [--<b>overwrite</b>]  [--<b>verbose</b>]  [--<b>quiet</b>] 
+
+<h3>Flags:</h3>
+<DL>
+<DT><b>-q</b></DT>
+<DD>Quiet</DD>
+
+<DT><b>-m</b></DT>
+<DD>Calculate max velocity instead of mean</DD>
+
+<DT><b>--overwrite</b></DT>
+<DD>Allow output files to overwrite existing files</DD>
+<DT><b>--verbose</b></DT>
+<DD>Verbose module output</DD>
+<DT><b>--quiet</b></DT>
+<DD>Quiet module output</DD>
+</DL>
+
+<h3>Parameters:</h3>
+<DL>
+<DT><b>dsm</b>=<em>name</em></DT>
+<DD>Input dem raster</DD>
+
+<DT><b>start</b>=<em>name</em></DT>
+<DD>Input zone file</DD>
+
+<DT><b>pdir</b>=<em>name</em></DT>
+<DD>Input raster preferential directions</DD>
+
+<DT><b>slim</b>=<em>float</em></DT>
+<DD>Slope limit value [%]</DD>
+<DD>Default: <em>0.36</em></DD>
+
+<DT><b>esp</b>=<em>float</em></DT>
+<DD>expansion coefficient [-]</DD>
+<DD>Default: <em>1.8</em></DD>
+
+<DT><b>nrw</b>=<em>integer</em></DT>
+<DD>number of random walk for each starting cell [-]</DD>
+<DD>Default: <em>100</em></DD>
+
+<DT><b>smean</b>=<em>float</em></DT>
+<DD>mean slope of conoid [%]</DD>
+<DD>Default: <em>0.1</em></DD>
+
+<DT><b>pmd</b>=<em>float</em></DT>
+<DD>perla mass-to-drag rough coefficient [m]</DD>
+<DD>Default: <em>70</em></DD>
+
+<DT><b>ps</b>=<em>float</em></DT>
+<DD>perla slippering rough coefficient [-]</DD>
+<DD>Default: <em>0.1</em></DD>
+
+<DT><b>vl</b>=<em>float</em></DT>
+<DD>maximun speed at wich there is deposition [m/s]</DD>
+<DD>Default: <em>14</em></DD>
+
+<DT><b>sl</b>=<em>float</em></DT>
+<DD>maximun slope at wich there is deposition [decimal value]</DD>
+<DD>Default: <em>0.4</em></DD>
+
+<DT><b>shm</b>=<em>float</em></DT>
+<DD>max deposition possible due to slope in a single cell for a RW [m]</DD>
+<DD>Default: <em>1.0</em></DD>
+
+<DT><b>vhm</b>=<em>float</em></DT>
+<DD>max deposition possible due to speed in a single cell for a RW [m]</DD>
+<DD>Default: <em>1.0</em></DD>
+
+<DT><b>sh0m</b>=<em>float</em></DT>
+<DD>max volume deposition possible per random walk [m3]</DD>
+<DD>Default: <em>20</em></DD>
+
+<DT><b>nrrw</b>=<em>name</em></DT>
+<DD>map random walks</DD>
+
+<DT><b>vel</b>=<em>name</em></DT>
+<DD>raster max velocities</DD>
+
+<DT><b>hgt</b>=<em>name</em></DT>
+<DD>raster sedimentation</DD>
+
+</DL>
+<HR>
+<P><a href="index.html">Main index</a> - <a href="raster.html">raster index</a> - <a href="full_index.html">Full index</a></P>
+<P>&copy; 2003-2008 <a href="http://grass.osgeo.org">GRASS Development Team</a></p>
+</body>
+</html>

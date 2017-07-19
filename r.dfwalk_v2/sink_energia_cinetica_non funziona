@@ -1,0 +1,143 @@
+// vecchio case 4
+	            	case 4: /* sink: go back and fill with sediment the hole */
+  						
+				//for(k=0;k<9;k++){
+				//	printf("mask.h[%d]: %lf - ",k,mask.h[k]);
+				//	printf("mask.s[%d]: %lf\n",k,mask.s[k]);
+				//}
+			        /* choose the next cell 
+							if(step>0) {
+			            delta_r = cell_path[step-1].point.r - cell_path[step].point.r;
+			            delta_c = cell_path[step-1].point.c - cell_path[step].point.c; 
+			        } else {
+			            delta_r = 0;
+			            delta_c = 0;
+			        }
+						
+				/* get the index of the previous cell 
+				idx_from = GetIdx(delta_r, delta_c);
+	                	*/
+					
+				/* get lower cell in the mask except the last one*/
+				idx_next = GetLower(&mask,idx_from);
+				//printf("next_idx=%d",idx_next);				
+					
+				/* get row and col of the next cell */
+				next_r = GetNewRowIdx(idx_next,cr);
+	                	next_c = GetNewColIdx(idx_next,cc);
+					
+				/* go back in path by BACK meters or to the starting cell and get distance */
+				bk=0; 
+				DL = 0;
+				while( DL < BACK && bk<step ){
+					bk++;
+					DN2 = pow((cell_path[step-bk].point.r - cell_path[step-bk+1].point.r)*S_dem.cellhd.ns_res,2);
+					DE2 = pow((cell_path[step-bk].point.c - cell_path[step-bk+1].point.c)*S_dem.cellhd.ew_res,2);
+					DL += sqrt( DN2 + DE2  );								
+				}
+				//while(getchar() != 'y') { 
+				//	printf("back of %d steps of %d\n",bk,step);
+				//	printf("current[%d][%d] -- backcell[%d][%d]\n",cr,cc,cell_path[step-bk].point.r,cell_path[step-bk].point.c);
+
+				//}
+
+				/* estimate the mean slope among 50m back cell and the current cell */
+				slope_s = (cell_path[step-bk].h - cell_path[step].h) / DL;
+					
+				//printf("estimated slope (backcell-next) = %lf\n",slope_s);						
+					
+				/* calculate sedimentation in the cells above sink */
+				for(s=1;s<=bk;s++){
+					DN2 = pow((cell_path[step-s].point.r - cell_path[step-s+1].point.r)*S_dem.cellhd.ns_res,2);
+					DE2 = pow((cell_path[step-s].point.c - cell_path[step-s+1].point.c)*S_dem.cellhd.ew_res,2);
+					sed_s = (slope_s/pow(2,s-1)) * sqrt(DN2+DE2) + mask.h[idx_next] - cell_path[step].h;
+					if (sed_s > 0) {
+						cell_path[step-s+1].Sed = sed_s;
+					}
+				//printf("estimated sedimantation (%d) = %lf\n",step-s, sed_s);							
+				}
+					
+				/* stop the path */
+				vel_next=0;
+				sed_next=0;
+
+					//printf("Calculated values 4: vel=%lf - Sedcur=%lf\n",vel_next, sed_s);
+					//while(getchar() != 'y') { printf("SINK FOUND"); } 						
+						
+		                 	/* calculate values (velocity, sedimentation, number of pass) */               
+		            	break;
+
+
+
+
+// new case 4
+case 4: /* sink: go back and fill with sediment the hole */
+				/* get lower cell in the mask except the last one*/
+				idx_next = GetLower(&mask,idx_from);
+				//printf("next_idx=%d",idx_next);
+				/* get the index of the next cell (maximum slope) --> dovrebbe essere la stessa cosa */
+				//idx = maximum(mask.w);			
+					
+				/* get row and col of the next cell */
+				next_r = GetNewRowIdx(idx_next,cr);
+	                	next_c = GetNewColIdx(idx_next,cc);
+	                	
+	                	/* set next cell row and column */
+			        cell_path[step+1].point.r  = next_r;
+			        cell_path[step+1].point.c = next_c;
+			        /* set slope */
+			        cell_path[step+1].Pend = mask.s[idx];
+	                	
+				/* set height */
+			        cell_path[step+1].h = mask.h[idx_next]; 
+			        
+				
+				if ( 0.5 * pow (cell_path[step].Vel,2) < ( 9.81 * (cell_path[step+1].h - cell_path[step].h) )) { /* This is an obtruct to the sediment flow --> SINK filling */
+					
+					/* calculate sedimentation in the sink */
+					cell_path[step].Sed = min_among_2(sed_Vhmax,sed_Shmax);
+					cell_path[step].Sed = min_among_2(cell_path[step].Sed , (cell_path[step+1].h - cell_path[step].h) );		
+						
+					/* stop the path */
+					vel_next=0;
+					sed_next=0;
+					
+				} else {     /* This sink isn't an obtruct to the sediment flow --> go down */			
+					
+					vel_next = cell_path[step].Vel - sqrt( 2 * 9.81 * (cell_path[step+1].h - cell_path[step].h) );
+						
+					if(vel_next>0) {
+						vel_next = sqrt(vel_next);
+						printf("velnext=%f",vel_next);
+					} else {
+						printf("velnext=%f",vel_next);
+			        		while(!getchar()){ }
+						vel_next = 0;
+					}
+					
+					
+					/* estimate sedimentation */
+					//if ( cell_path[step+1].Vel  < sed_Vlim ) {
+					if ( vel_next  < sed_Vlim && vel_next>0) {
+			            		sed_veloc = sed_Vhmax * ( 1 - vel_next / sed_Vlim );
+						sed_veloc = min_among_2 (sed_veloc,sed_Vhmax);
+			        	} else {
+			            		sed_veloc = 0;
+			        	}
+
+					if ( cell_path[step+1].Pend  < sed_Slim ) {
+					    sed_slope = sed_Shmax * ( 1 - cell_path[step+1].Pend / sed_Slim );
+					    sed_slope = min_among_2 (sed_slope,sed_Shmax);
+					} else {
+					    sed_slope = 0;
+					}
+					
+			        	sed_next = min_among_2 (sed_veloc,sed_Shmax);
+					
+					if (sed_next>0){
+						printf("sink:vel_next=%f, sed_next=%f\n",vel_next, sed_next);
+					}
+					
+				} /* end if kinetic energy */					                
+	                	
+			break;

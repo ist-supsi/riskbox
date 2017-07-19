@@ -1,0 +1,167 @@
+#!/usr/bin/python
+# -*- coding:utf-8 -*-
+############################################################################
+#
+# MODULE:       v.sample.class.py
+#
+# AUTHOR(S):    M. Cannata, M. Molinari (IST-SUPSI www.istgis.ist.supsi.ch:8001/GEOMATICA)
+#
+# PURPOSE:      Sample a raster map by areas or lines
+#
+# COPYRIGHT:    (c) 2007 The GRASS Development Team
+#
+#               This program is free software under the GNU General Public
+#               License (>=v2). Read the file COPYING that comes with GRASS
+#               for details.
+#
+############################################################################
+#%Module
+#% description:  Sample a raster map by areas or lines
+#% keywords: vector, raster,sample
+#%end
+#%option
+#% key: input
+#% type: string
+#% gisprompt: old,vector,vector
+#% key_desc : name
+#% description: input
+#% required : yes
+#%end
+#%option
+#% key: raster
+#% type: string
+#% gisprompt: old,cell,raster
+#% key_desc : name
+#% description: basis map
+#% required : yes
+#%end
+#%option
+#% key: pre
+#% type: string
+#% key_desc : prefix
+#% description: column name prefix
+#% required : yes
+#%end
+#%option
+#%  key: mode
+#%  type: string
+#%  options:min,max,ave,sum
+#%  multiple: yes
+#%  answer: ave
+#%  description: Size of the neighborhood
+#%  required : yes
+#%end
+
+import os,sys,subprocess,string,random,math,tempfile,time
+
+def main(): 
+
+    vect = os.getenv('GIS_OPT_input')
+    rast = os.getenv('GIS_OPT_raster')
+    opt = os.getenv('GIS_OPT_mode')
+    pre = os.getenv('GIS_OPT_pre')
+
+
+    if opt.find("sum") >= 0:  
+        cmdargs01 = ["v.db.addcol","map=%s" %vect,"layer=1","columns=%s_sum double"%pre]
+        proc01 = subprocess.Popen(cmdargs01, stdout=subprocess.PIPE,stderr=subprocess.PIPE) 
+        proc01.wait()
+
+    if opt.find("ave") >= 0:
+        cmdargs02 = ["v.db.addcol","map=%s" %vect,"layer=1","columns=%s_ave double"%pre]
+        proc02 = subprocess.Popen(cmdargs02, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        proc02.wait()
+
+    if opt.find("min") >= 0:
+        cmdargs03 = ["v.db.addcol","map=%s" %vect,"layer=1","columns=%s_min double"%pre]
+        proc03 = subprocess.Popen(cmdargs03, stdout=subprocess.PIPE,stderr=subprocess.PIPE) 
+        proc03.wait()
+
+    if opt.find("max") >= 0:
+        cmdargs04 = ["v.db.addcol","map=%s" %vect,"layer=1","columns=%s_max double"%pre]
+        proc04 = subprocess.Popen(cmdargs04, stdout=subprocess.PIPE,stderr=subprocess.PIPE) 
+        proc04.wait()
+
+    cmdargs0 = ["v.to.rast", "input=%s" %vect, "output=tmp_rast_class", "use=cat", "--o"]
+    proc0 = subprocess.Popen(cmdargs0, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    proc0.wait()
+    
+    cmdargs1 = ["r.cats","map=tmp_rast_class"]
+    proc1 = subprocess.Popen(cmdargs1, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    cat2 = proc1.communicate()[0] 
+    proc1.wait()
+
+    cat1= cat2.split("\n")
+    del cat1[len(cat1)-1]
+
+    for a in cat1:
+        cat =a.split("\t")
+        if cat[0] != "*" or cat[0]!="\n":
+        
+            cmdargs2 = ["r.mapcalc","tmp_sample_class=if(tmp_rast_class==%s,%s,null())" %(cat[0],rast)]
+            proc2 = subprocess.Popen(cmdargs2, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            proc2.wait()
+
+
+
+            if opt.find("sum") >= 0 or opt.find("ave")>=0:  
+                cmdargs3 = ["r.sum","rast=tmp_sample_class"]
+                proc3 = subprocess.Popen(cmdargs3, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                mods = proc3.communicate()[0].split("=")
+                proc3.wait()
+                somma = mods[1]
+
+                if opt.find("sum") >= 0:
+                    cmdargs51 = ["v.db.update","map=%s" %vect,"layer=1","column=%s_sum"%pre,"value=%s" %somma,"where=cat=%s" %cat[0],"--quiet"]
+                    proc51 = subprocess.Popen(cmdargs51, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                    proc51.wait()
+
+                if opt.find("ave") >= 0:
+                    cmdargs52 = ["r.stats","-1", "-n","input=tmp_sample_class","--quiet"]
+                    proc52 = subprocess.Popen(cmdargs52, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                    num_l = proc52.communicate()[0].split("\n")
+                    num =len(num_l)-1
+                    proc52.wait()
+                    print '%s'%num
+                    aver = float(somma)/float(num)
+
+                    cmdargs53 = ["v.db.update","map=%s" %vect,"layer=1","column=%s_ave"%pre,"value=%s" %aver,"where=cat=%s" %cat[0],"--quiet"]
+                    proc53 = subprocess.Popen(cmdargs53, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                    proc53.wait()
+                
+            if opt.find("min") >= 0 or opt.find("max") >= 0:
+                cmdargs61 = ["r.info","-r","map=tmp_sample_class"]
+                proc61 = subprocess.Popen(cmdargs61, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                ranges = proc61.communicate()[0].split("\n")
+                proc61.wait()
+
+                mini = ranges[0].split("=")[1]
+                maxi = ranges[1].split("=")[1]
+                
+                if opt.find("min") >= 0:
+                    cmdargs62 = ["v.db.update","map=%s" %vect,"layer=1","column=%s_min"%pre,"value=%s" %mini,"where=cat=%s" %cat[0],"--quiet"]
+                    proc62 = subprocess.Popen(cmdargs62, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                    proc62.wait()
+
+                if opt.find("max") >= 0:
+                    cmdargs63 = ["v.db.update","map=%s" %vect,"layer=1","column=%s_max"%pre,"value=%s" %maxi,"where=cat=%s" %cat[0],"--quiet"]
+                    proc63 = subprocess.Popen(cmdargs63, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                    proc63.wait()
+
+    cmdargs7 = ["g.remove","rast=tmp_sample_class,tmp_rast_class", "--quiet"]
+    proc7 = subprocess.Popen(cmdargs7, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    proc7.wait()
+    
+    print "table successfully updated."
+
+    return
+
+if __name__ == "__main__":
+    if ( len(sys.argv) <= 1 or sys.argv[1] != "@ARGS_PARSED@" ):
+        os.execvp("g.parser", [sys.argv[0]] + sys.argv)
+    else:
+	main();  
+
+
+
+

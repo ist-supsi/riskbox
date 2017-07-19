@@ -1,0 +1,131 @@
+: && gcc -L/usr/local/grass-7.0.svn/lib -L/usr/local/grass-7.0.svn/lib -Wl,--export-dynamic -Wl,-rpath-link,/usr/local/grass-7.0.svn/lib -L/usr/include/postgresql/libpq  -o /usr/local/grass-7.0.svn/bin/r.damflood OBJ.i686-pc-linux-gnu/main.o    -lgrass_gis.7.0.svn  -lm  
+OBJ.i686-pc-linux-gnu/main.o: In function `main':
+
+CORRETTO   G_find_raster2
+/home/roberto/Scrivania/r.damflood/main.c:428: undefined reference to `G_find_cell2'
+/home/roberto/Scrivania/r.damflood/main.c:432: undefined reference to `G_find_cell2'
+/home/roberto/Scrivania/r.damflood/main.c:436: undefined reference to `G_find_cell2'
+/home/roberto/Scrivania/r.damflood/main.c:440: undefined reference to `G_find_cell2'
+CORRETTO   G_open_Rast_old  Rast_open_old
+/home/roberto/Scrivania/r.damflood/main.c:446: undefined reference to `G_open_cell_old'
+/home/roberto/Scrivania/r.damflood/main.c:448: undefined reference to `G_open_cell_old'
+/home/roberto/Scrivania/r.damflood/main.c:450: undefined reference to `G_open_cell_old'
+/home/roberto/Scrivania/r.damflood/main.c:452: undefined reference to `G_open_cell_old'
+CORRETTO   Rast_allocate_f_buf();
+/home/roberto/Scrivania/r.damflood/main.c:506: undefined reference to `G_allocate_f_raster_buf'
+/home/roberto/Scrivania/r.damflood/main.c:507: undefined reference to `G_allocate_d_raster_buf'
+/home/roberto/Scrivania/r.damflood/main.c:508: undefined reference to `G_allocate_f_raster_buf'
+/home/roberto/Scrivania/r.damflood/main.c:509: undefined reference to `G_allocate_f_raster_buf'
+CORRETTO   Rast_window_rows
+/home/roberto/Scrivania/r.damflood/main.c:513: undefined reference to `G_window_rows'
+/home/roberto/Scrivania/r.damflood/main.c:514: undefined reference to `G_window_cols'
+CORRETTO Rast_get_f_row (infd_ELEV, inrast_ELEV, row);
+/home/roberto/Scrivania/r.damflood/main.c:556: undefined reference to `G_get_f_raster_row'
+/home/roberto/Scrivania/r.damflood/main.c:558: undefined reference to `G_get_d_raster_row'
+/home/roberto/Scrivania/r.damflood/main.c:560: undefined reference to `G_get_f_raster_row'
+/home/roberto/Scrivania/r.damflood/main.c:562: undefined reference to `G_get_f_raster_row'
+CORRETTO    Rast_close
+/home/roberto/Scrivania/r.damflood/main.c:608: undefined reference to `G_close_cell'
+/home/roberto/Scrivania/r.damflood/main.c:609: undefined reference to `G_close_cell'
+/home/roberto/Scrivania/r.damflood/main.c:610: undefined reference to `G_close_cell'
+/home/roberto/Scrivania/r.damflood/main.c:611: undefined reference to `G_close_cell'
+
+CORRETTO  G_open_raster_new(name1,DCELL_TYP)--> Rast_open_new (name1,DCELL_TYPE)
+/*************************************************************************************
+
+                              se funge dillo a monia
+
+**************************************************************************************/ 
+/home/roberto/Scrivania/r.damflood/main.c:1537: undefined reference to `G_open_raster_new'
+/home/roberto/Scrivania/r.damflood/main.c:1541: undefined reference to `G_open_raster_new'
+
+/home/roberto/Scrivania/r.damflood/main.c:1550: undefined reference to `G_allocate_d_raster_buf'
+/home/roberto/Scrivania/r.damflood/main.c:1553: undefined reference to `G_allocate_d_raster_buf'
+
+
+CORRETTO
+***************************************************************************************
+if (G_put_raster_row (outfd_H, outrast_H, TYPE_DOUBLE) < 0)
+			G_fatal_error (_("Cannot write to <%s>"),name2);
+
+diviene
+Rast_put_row (outfd_H, outrast_H, TYPE_DOUBLE)
+oppure in altri casi 
+Rast_put_d_row
+***************************************************************************************
+
+
+
+/home/roberto/Scrivania/r.damflood/main.c:1592: undefined reference to `G_put_d_raster_row'
+/home/roberto/Scrivania/r.damflood/main.c:1595: undefined reference to `G_put_d_raster_row'
+
+CORRETTO    Rast_close
+/home/roberto/Scrivania/r.damflood/main.c:1612: undefined reference to `G_close_cell'
+/home/roberto/Scrivania/r.damflood/main.c:1615: undefined reference to `G_close_cell'
+
+CORRETTO  G_open_raster_new(name1,DCELL_TYP)--> Rast_open_new (name1,DCELL_TYPE)
+/home/roberto/Scrivania/r.damflood/main.c:1634: undefined reference to `G_open_raster_new'
+/home/roberto/Scrivania/r.damflood/main.c:1638: undefined reference to `G_open_raster_new'
+/home/roberto/Scrivania/r.damflood/main.c:1649: undefined reference to `G_open_raster_new'
+/home/roberto/Scrivania/r.damflood/main.c:1651: undefined reference to `G_open_raster_new'
+/home/roberto/Scrivania/r.damflood/main.c:1653: undefined reference to `G_open_raster_new'
+OBJ.i686-pc-linux-gnu/main.o:/home/roberto/Scrivania/r.damflood/main.c:1663: more undefined references to `G_open_raster_new' follow
+OBJ.i686-pc-linux-gnu/main.o: In function `main':
+/home/roberto/Scrivania/r.damflood/main.c:1688: undefined reference to `G_allocate_d_raster_buf'
+/home/roberto/Scrivania/r.damflood/main.c:1691: undefined reference to `G_allocate_d_raster_buf'
+/home/roberto/Scrivania/r.damflood/main.c:1694: undefined reference to `G_allocate_d_raster_buf'
+/home/roberto/Scrivania/r.damflood/main.c:1698: undefined reference to `G_allocate_d_raster_buf'
+/home/roberto/Scrivania/r.damflood/main.c:1699: undefined reference to `G_allocate_d_raster_buf'
+OBJ.i686-pc-linux-gnu/main.o:/home/roberto/Scrivania/r.damflood/main.c:1700: more undefined references to `G_allocate_d_raster_buf' follow
+OBJ.i686-pc-linux-gnu/main.o: In function `main':
+/home/roberto/Scrivania/r.damflood/main.c:1756: undefined reference to `G_set_d_null_value'
+/home/roberto/Scrivania/r.damflood/main.c:1761: undefined reference to `G_set_d_null_value'
+/home/roberto/Scrivania/r.damflood/main.c:1766: undefined reference to `G_set_d_null_value'
+/home/roberto/Scrivania/r.damflood/main.c:1566: undefined reference to `G_set_d_null_value'
+/home/roberto/Scrivania/r.damflood/main.c:1804: undefined reference to `G_set_d_null_value'
+OBJ.i686-pc-linux-gnu/main.o:/home/roberto/Scrivania/r.damflood/main.c:1799: more undefined references to `G_set_d_null_value' follow
+OBJ.i686-pc-linux-gnu/main.o: In function `main':
+
+rats
+/home/roberto/Scrivania/r.damflood/main.c:1598: undefined reference to `G_put_d_raster_row'
+/home/roberto/Scrivania/r.damflood/main.c:1820: undefined reference to `G_put_raster_row'
+/home/roberto/Scrivania/r.damflood/main.c:1824: undefined reference to `G_put_raster_row'
+/home/roberto/Scrivania/r.damflood/main.c:1833: undefined reference to `G_put_raster_row'
+/home/roberto/Scrivania/r.damflood/main.c:1835: undefined reference to `G_put_raster_row'
+/home/roberto/Scrivania/r.damflood/main.c:1837: undefined reference to `G_put_raster_row'
+OBJ.i686-pc-linux-gnu/main.o:/home/roberto/Scrivania/r.damflood/main.c:1842: more undefined references to `G_put_raster_row' follow
+OBJ.i686-pc-linux-gnu/main.o: In function `main':
+
+CORRETTO    Rast_close
+/home/roberto/Scrivania/r.damflood/main.c:1892: undefined reference to `G_close_cell'
+/home/roberto/Scrivania/r.damflood/main.c:1896: undefined reference to `G_close_cell'
+/home/roberto/Scrivania/r.damflood/main.c:1900: undefined reference to `G_close_cell'
+/home/roberto/Scrivania/r.damflood/main.c:1905: undefined reference to `G_close_cell'
+/home/roberto/Scrivania/r.damflood/main.c:1907: undefined reference to `G_close_cell'
+OBJ.i686-pc-linux-gnu/main.o:/home/roberto/Scrivania/r.damflood/main.c:1909: more undefined references to `G_close_cell' follow
+OBJ.i686-pc-linux-gnu/main.o: In function `main':
+CORRETTO Rast_set_d_null_value
+/home/roberto/Scrivania/r.damflood/main.c:1733: undefined reference to `G_set_d_null_value'
+
+
+/home/roberto/Scrivania/r.damflood/main.c:1828: undefined reference to `G_put_raster_row'
+/home/roberto/Scrivania/r.damflood/main.c:1849: undefined reference to `G_put_raster_row'
+/home/roberto/Scrivania/r.damflood/main.c:1556: undefined reference to `G_allocate_d_raster_buf'
+
+
+
+CORRETTO  G_open_raster_new(name1,DCELL_TYP)--> Rast_open_new (name1,DCELL_TYPE)
+/home/roberto/Scrivania/r.damflood/main.c:1545: undefined reference to `G_open_raster_new'
+CORRETTO    Rast_close
+/home/roberto/Scrivania/r.damflood/main.c:1618: undefined reference to `G_close_cell'
+/home/roberto/Scrivania/r.damflood/main.c:1642: undefined reference to `G_open_raster_new'
+CORRETTO    Rast_close
+/home/roberto/Scrivania/r.damflood/main.c:1920: undefined reference to `G_close_cell'
+
+
+/home/roberto/Scrivania/r.damflood/main.c:1707: undefined reference to `G_allocate_d_raster_buf'
+
+CORRETTO  G_open_raster_new(name1,DCELL_TYP)--> Rast_open_new (name1,DCELL_TYPE)
+/home/roberto/Scrivania/r.damflood/main.c:1670: undefined reference to `G_open_raster_new'
+collect2: ld returned 1 exit status
+make: *** [/usr/local/grass-7.0.svn/bin/r.damflood] Error 1

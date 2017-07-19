@@ -1,0 +1,61 @@
+<h2>DESCRIPTION</h2>
+
+<em>r.ucode</em> is a tool to perform automatic sensitivity analysis and/or parameter estimation of GRASS modules taking advantages of UCODE software.
+
+The module modes are:
+<ul>
+<li><em>normal</em>: the module create UCODE configuration files and run the software. It is the default mode.</li>
+<li><em>config</em>: the module only generate UCODE configuration files.</li>
+<li><em>advance</em>: the module run UCODE software using user-defined configurations files. </li>
+</ul>
+
+<p>
+<b>Normal mode</b>
+<br>The input parameters of the  module are:
+<ul>
+<li> a folder path for results (<em>folder</em>). A prefix for output files can also be specified (<em>prefix</em>). </li>
+<li> a vector map with the observation points (<em>obs_points</em>): for each point the observed value is needed. If a colum name (<em>col_value</em>) is specified the module extracts these values directly from the vector. Otherwise, the module can obtain the values by sampling an observation raster map (<em>obs_map</em>). Optionally the user can specify other vector columns with information about points name (<em>col_name</em>), points weight on the calculations (<em>col_stat</em>, <em>col_statflag</em>).</li>
+<li> the GRASS module arguments: name (<em>module</em>), fixed arguments (<em>fixed</em>), output raster map with values to compare to the observations (<em>modout</em>), a text file with the module parameters to be calibrated expressed in the table format required by UCODE (<em>par_table</em>).</li>
+<li> the UCODE mode: the user can select between sensitivity analysis (<em>-s</em>), parameter estimation (<em>-o</em>), parameter estimation performed taking advantage of sensitivity analysis (<em>-so</em>). In the last case parameter estimation can be performed with dynamic omission of insensitive parameters (<em>-soi</em>).</li>
+<li> UCODE parameters for regression-control information: maximum number of parameter-estimation iterations allowed (<em>max_iter</em>), tolerance threshold convergence based on parameter values (<em>tolpar</em>) or model fit (<em>tolsosc</em>), maximum fractional amount parameter values allowed to change (<em>max_change</em>) and  transformation space (<em>maxchange_realm</em>) to which <em>max_change</em> applies. If not specified, the default values proposed by UCODE are set. </li>
+</ul> 
+</p>
+
+<p>
+<b>Config mode</b>
+<br> With this running mode all the input specify in normal mode are required with the exception of the prefix output files (<em>prefix</em>).
+</p>
+
+<p>
+<b>Advance mode</b>
+<br>With this running mode the only required inputs are: 
+<ul>
+<li>the folder path (<em>folder</em>) where UCODE configuration files are available and results are outputted.</li>
+<li>optionally a prefix for output files can also be specified. </li>
+<li>the vector points map (<em>obs_points</em>). </li>
+</ul>
+</p>
+
+<h2>NOTES</h2>
+This module requires UCODE_2005-version 1.026 correctly installed. The software is available at <a href="http://igwmc.mines.edu/freeware/ucode/ucode_2005_1.026.tgz">http://igwmc.mines.edu/freeware/ucode/ucode_2005_1.026.tgz</a>; instructions for compiling the source code can be found at the following link <a href="http://inside.mines.edu/~hseo/ucode/ucode_parflow.html">http://inside.mines.edu/~hseo/ucode/ucode_parflow.html</a>.
+Currently only the basic settings of UCODE configuration files are considered. If advanced settings are required, the user can generate the basic configuration files (<em>config</em> mode), add manually more information and relaunch the module (<em>advance</em> mode). For more information please refer to UCODE documentation.
+
+<h2>EXAMPLE</h2>
+In the following an example of r.ucode command for calibration of r.massmov GRASS module is presented:
+<div class="code"><pre>
+r.ucode folder=/home/user/CALIB_UCODE/results/  module=r.massmov  modout="h=calib" par_table=/home/user/CALIB_UCODE/par_table.txt \
+fixed="elev=dem h_ini=land_init fluiddist=fluid_map rheology=Voellmy stop_thres=0.99 step_thres=10 timesteps=10000" obs_points=points_map \
+col_name=Obsname col_statistic=Statistic col_statflag=StatFlag obs_map=obs_points
+</div> </pre>
+
+
+<h2>REFERENCES</h2>
+Poeter, E.P., Hill, M.C., Banta, E.R., Mehl, Steffen, and Christensen, Steen, 2005, <a href="http://igwmc.mines.edu/freeware/ucode/UCODE_2005_update_2008-02-10.pdf">UCODE_2005 and Six Other Computer Codes for Universal Sensitivity Analysis, Calibration, and Uncertainty Evaluation</a>. U.S. Geological Survey Techniques and Methods 6-A11, 283p.
+
+
+
+<h2>AUTHORS</h2>
+Monia Molinari, Massimiliano Cannata 
+<br>Institute of Earth Sciences, University of Applied Sciences and Arts of Southern Switzerland
+
+<p><i>Last changed: $Date: 2012-09-28 14:14:30 +0200 (Fri, 28 Sep 2012) $</i>

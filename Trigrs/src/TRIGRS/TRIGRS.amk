@@ -1,0 +1,405 @@
+#  Note:fed08220 - This file not intended for hand editing.
+#  Absoft Developer Tools Interface requires use of this makefile.
+#  Use the Generate Makefile command to customize your own makefiles.
+#
+#  Absoft Corporation Compiler Interface Makefile(v4.0.1).
+#
+#
+#  Type 'amake -f "TRIGRS.amk"' in this directory at the Terminal.app prompt
+#  to execute this makefile. Type 'amake -f "TRIGRS.amk" clean' to
+#  remove old *.o, *.out, and any other project related files.
+#
+#
+#  This file was created by Absoft Developer Tools Interface.
+#  File created on: Tue May 27 14:57:16 2008
+#
+#
+
+
+
+#
+#  Variables and flags for the compiler(s) and linker.
+#
+F95COMPILER= f95
+F77COMPILER= f77
+C_COMPILER=  gcc
+CPPCOMPILER= c++
+LINKER=      c++
+
+F9x_FLAGS=   -B18 -et -Yaltivec -c -nowdir -s -YEXT_NAMES=ASIS -YCOM_NAMES=ASIS 
+F77_FLAGS=   -B18 -et -c -s -f 
+FF95_FLAG=   
+F_DEFINES=   
+C_FLAGS=     
+CPP_FLAGS=   -x c++
+C_DEFINES=   
+C_UNDEFS=    
+
+
+
+DFLT_LNK_FLG=-framework Carbon 
+USER_LNK_FLG=-Xlinker -w -Xlinker -Y -Xlinker 10 
+LNK_FLAGS=   $(DFLT_LNK_FLG) $(USER_LNK_FLG)
+
+BASENAME=    TRIGRS
+#
+#  Name of the executable.
+#
+TARGET=      TRIGRS.out
+OUTDIR=      .
+OBJDIR=      ./build
+
+#
+#  Files for this executable.
+#
+F95FILES=    "./trigrs.f90" "./flux.f90" "./trini.f95" "./input_vars.f95" "./input_file_defs.f95"  \
+            "./rnoff.f95" "./grids.f95" "./steady.f95" "./model_vars.f95"  \
+            "./unsinf.f95" "./unsfin.f95" "./savage.f95" "./svgstp.f95"  \
+            "./unsth.f95" "./smallt.f95" "./dsimps.f95" "./satfin.f95"  \
+            "./ivestp.f95" "./satinf.f95" "./iverson.f95" "./pstpf.f95"  \
+            "./pstpi.f95" 
+MODFILES=    
+FFILES=      "./calerf.f" "./irdgrd.f" "./derfc.f" "./irdswm.f" "./ssvgrd.f"  \
+            "./srdswm.f" "./srdgrd.f" "./roots.f" "./isvgrd.f" "./dbsct.f" 
+CFILES=      
+RCFILES=     
+RESFILES=    
+PLISTFILES=  
+HFILES=      
+OBJS=        
+FRAMEWORKS=  
+OTHERFILES=  
+MKFILE=      ./TRIGRS.amk
+
+#
+#  Libraries for this executable.
+#
+USER_LIBS=   
+DFLT_LIBS=   "/Applications/Absoft/lib/objcinit_stub.o" "/Applications/Absoft/lib/absoft_et_mac.o"  \
+            -L"/Applications/Absoft/lib" -lf90math_altivec -lblas_altivec  \
+            -lfio -lf77math -lm 
+LIBS=        $(USER_LIBS) $(DFLT_LIBS) $(FRAMEWORKS)
+
+
+
+#
+#  Include directories specified for this executable.
+#
+INCS=        -I"." 
+LPATHS=      -Xlinker -L"." 
+
+
+
+#
+#  Module flags, files and directories specified for this executable.
+#
+MOD_FLAGS=   
+MOD_INCS=    
+
+
+
+#  The following macro(s) and rule(s) are required for a full build
+#
+#  Rules and dependencies for the executable.
+#
+SRCFILES=    $(FFILES) $(F90FILES) $(CFILES) $(HFILES) $(RCFILES) $(RESFILES) $(OTHERFILES)
+RCRSFILES=   $(RESFILES) 
+
+OBJFILES=    $(OBJS) "$(OBJDIR)/trigrs.o" "$(OBJDIR)/flux.o" "$(OBJDIR)/trini.o"  \
+            "$(OBJDIR)/input_vars.o" "$(OBJDIR)/input_file_defs.o"  \
+            "$(OBJDIR)/rnoff.o" "$(OBJDIR)/grids.o" "$(OBJDIR)/steady.o"  \
+            "$(OBJDIR)/model_vars.o" "$(OBJDIR)/unsinf.o"  \
+            "$(OBJDIR)/unsfin.o" "$(OBJDIR)/savage.o" "$(OBJDIR)/svgstp.o"  \
+            "$(OBJDIR)/unsth.o" "$(OBJDIR)/smallt.o" "$(OBJDIR)/dsimps.o"  \
+            "$(OBJDIR)/satfin.o" "$(OBJDIR)/ivestp.o" "$(OBJDIR)/satinf.o"  \
+            "$(OBJDIR)/iverson.o" "$(OBJDIR)/pstpf.o" "$(OBJDIR)/pstpi.o" "$(OBJDIR)/calerf.o" "$(OBJDIR)/irdgrd.o"  \
+            "$(OBJDIR)/derfc.o" "$(OBJDIR)/irdswm.o" "$(OBJDIR)/ssvgrd.o"  \
+            "$(OBJDIR)/srdswm.o" "$(OBJDIR)/srdgrd.o" "$(OBJDIR)/roots.o"  \
+            "$(OBJDIR)/isvgrd.o" "$(OBJDIR)/dbsct.o" 
+
+#
+#  Optional macros, rules and dependencies included from prebuild file.
+#
+
+
+#
+#  Default dependency for this makefile
+#
+default: "$(OUTDIR)/$(TARGET)"
+
+all: "$(OUTDIR)/$(TARGET)"
+
+
+"$(OUTDIR)/$(TARGET)": "$(OUTDIR)" "$(OBJDIR)" "$(MKFILE)" $(OBJFILES) $(RCRSFILES)\
+	$(USER_LIBS) $(MODFILES)
+	$(LINKER) $(LPATHS) $(OBJFILES) $(LNK_FLAGS) $(LIBS) \
+		-o "$(OUTDIR)/$(TARGET)"
+#
+#  Optional commands, macros, rules and dependencies from postbuild file.
+#
+#  To append additional commands to the default target dependency 
+#  begin the first line of the postbuild file with a tab.
+#
+
+
+.r.rsrc:
+	$(MKDIR) -p "$(APPDIR)/$(REZDIR)"
+	touch "$(APPDIR)/$(REZDIR)"
+	$(RC) -o "$(APPDIR)/$(REZDIR)/$(BASENAME).rsrc" $(RCFLAGS) $<
+
+
+"$(OBJDIR)" :
+	if [ ! -e "$(OBJDIR)" ]; then $(MKDIR) "$(OBJDIR)" ; fi
+
+
+"$(OUTDIR)" :
+
+
+"$(APPDIR)/$(REZDIR)" :
+	$(MKDIR) -p "$(APPDIR)/$(REZDIR)"
+
+
+qclean: clean_exe clean_misc clean_plugins
+	rm -f "$(OBJDIR)"/*.mod
+	rm -f "$(OBJDIR)"/*.rsrc
+	rm -f "$(OBJDIR)"/*.a
+	rm -f "$(OBJDIR)"/*.o
+
+cleanProjFiles: clean
+
+clean: clean_f95 clean_f77 clean_acc clean_target
+
+clean_misc:
+	rm -f "$(OBJDIR)"/*.amh
+	rm -f "$(OBJDIR)"/*.bif
+	rm -f "$(OBJDIR)"/*.int
+	rm -f "$(OUTDIR)"/*.amh
+	rm -f "$(OUTDIR)"/*.bif
+	rm -f "$(OUTDIR)"/*.int
+
+clean_f95: clean_f95src clean_f95mods
+
+clean_target: clean_misc clean_plugins clean_rsrc clean_exe
+
+clean_exe:
+	rm -f "$(OUTDIR)/$(TARGET)"
+
+clean_rsrc:
+
+clean_f95src:
+	rm -f "$(OBJDIR)/trigrs.o"
+	rm -f "$(OBJDIR)/flux.o"
+	rm -f "$(OBJDIR)/trini.o"
+	rm -f "$(OBJDIR)/input_vars.o"
+	rm -f "$(OBJDIR)/input_file_defs.o"
+	rm -f "$(OBJDIR)/rnoff.o"
+	rm -f "$(OBJDIR)/grids.o"
+	rm -f "$(OBJDIR)/steady.o"
+	rm -f "$(OBJDIR)/model_vars.o"
+	rm -f "$(OBJDIR)/unsinf.o"
+	rm -f "$(OBJDIR)/unsfin.o"
+	rm -f "$(OBJDIR)/savage.o"
+	rm -f "$(OBJDIR)/svgstp.o"
+	rm -f "$(OBJDIR)/unsth.o"
+	rm -f "$(OBJDIR)/smallt.o"
+	rm -f "$(OBJDIR)/dsimps.o"
+	rm -f "$(OBJDIR)/satfin.o"
+	rm -f "$(OBJDIR)/ivestp.o"
+	rm -f "$(OBJDIR)/satinf.o"
+	rm -f "$(OBJDIR)/iverson.o"
+	rm -f "$(OBJDIR)/pstpf.o"
+	rm -f "$(OBJDIR)/pstpi.o"
+
+clean_f77:
+	rm -f "$(OBJDIR)/calerf.o"
+	rm -f "$(OBJDIR)/irdgrd.o"
+	rm -f "$(OBJDIR)/derfc.o"
+	rm -f "$(OBJDIR)/irdswm.o"
+	rm -f "$(OBJDIR)/ssvgrd.o"
+	rm -f "$(OBJDIR)/srdswm.o"
+	rm -f "$(OBJDIR)/srdgrd.o"
+	rm -f "$(OBJDIR)/roots.o"
+	rm -f "$(OBJDIR)/isvgrd.o"
+	rm -f "$(OBJDIR)/dbsct.o"
+
+clean_acc:
+
+clean_plugins:
+
+clean_f95mods:
+
+
+TRIGRS_F90_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/trigrs.o": "./trigrs.f90"
+	$(F95COMPILER) -o "$(OBJDIR)/trigrs.o" $(TRIGRS_F90_11)  "./trigrs.f90"
+
+
+FLUX_F90_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/flux.o": "./flux.f90"
+	$(F95COMPILER) -o "$(OBJDIR)/flux.o" $(FLUX_F90_11)  "./flux.f90"
+
+
+TRINI_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/trini.o": "./trini.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/trini.o" $(TRINI_F95_11)  "./trini.f95"
+
+
+INPUT_VARS_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/input_vars.o": "./input_vars.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/input_vars.o" $(INPUT_VARS_F95_11)  "./input_vars.f95"
+
+
+INPUT_FILE_DEFS_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/input_file_defs.o": "./input_file_defs.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/input_file_defs.o" $(INPUT_FILE_DEFS_F95_11)  "./input_file_defs.f95"
+
+
+RNOFF_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/rnoff.o": "./rnoff.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/rnoff.o" $(RNOFF_F95_11)  "./rnoff.f95"
+
+
+GRIDS_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/grids.o": "./grids.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/grids.o" $(GRIDS_F95_11)  "./grids.f95"
+
+
+STEADY_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/steady.o": "./steady.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/steady.o" $(STEADY_F95_11)  "./steady.f95"
+
+
+MODEL_VARS_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/model_vars.o": "./model_vars.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/model_vars.o" $(MODEL_VARS_F95_11)  "./model_vars.f95"
+
+
+UNSINF_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/unsinf.o": "./unsinf.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/unsinf.o" $(UNSINF_F95_11)  "./unsinf.f95"
+
+
+UNSFIN_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/unsfin.o": "./unsfin.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/unsfin.o" $(UNSFIN_F95_11)  "./unsfin.f95"
+
+
+SAVAGE_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/savage.o": "./savage.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/savage.o" $(SAVAGE_F95_11)  "./savage.f95"
+
+
+SVGSTP_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/svgstp.o": "./svgstp.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/svgstp.o" $(SVGSTP_F95_11)  "./svgstp.f95"
+
+
+UNSTH_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/unsth.o": "./unsth.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/unsth.o" $(UNSTH_F95_11)  "./unsth.f95"
+
+
+SMALLT_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/smallt.o": "./smallt.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/smallt.o" $(SMALLT_F95_11)  "./smallt.f95"
+
+
+DSIMPS_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/dsimps.o": "./dsimps.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/dsimps.o" $(DSIMPS_F95_11)  "./dsimps.f95"
+
+
+SATFIN_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/satfin.o": "./satfin.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/satfin.o" $(SATFIN_F95_11)  "./satfin.f95"
+
+
+IVESTP_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/ivestp.o": "./ivestp.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/ivestp.o" $(IVESTP_F95_11)  "./ivestp.f95"
+
+
+SATINF_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/satinf.o": "./satinf.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/satinf.o" $(SATINF_F95_11)  "./satinf.f95"
+
+
+IVERSON_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/iverson.o": "./iverson.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/iverson.o" $(IVERSON_F95_11)  "./iverson.f95"
+
+
+PSTPF_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/pstpf.o": "./pstpf.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/pstpf.o" $(PSTPF_F95_11)  "./pstpf.f95"
+
+
+PSTPI_F95_11 =   $(INCS) $(F9x_FLAGS) $(MOD_FLAGS) $(MOD_INCS) 
+"$(OBJDIR)/pstpi.o": "./pstpi.f95"
+	$(F95COMPILER) -o "$(OBJDIR)/pstpi.o" $(PSTPI_F95_11)  "./pstpi.f95"
+
+
+CALERF_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/calerf.o": "./calerf.f"
+	$(F77COMPILER) -o "$(OBJDIR)/calerf.o" $(CALERF_F_11)  "./calerf.f"
+
+
+IRDGRD_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/irdgrd.o": "./irdgrd.f"
+	$(F77COMPILER) -o "$(OBJDIR)/irdgrd.o" $(IRDGRD_F_11)  "./irdgrd.f"
+
+
+DERFC_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/derfc.o": "./derfc.f"
+	$(F77COMPILER) -o "$(OBJDIR)/derfc.o" $(DERFC_F_11)  "./derfc.f"
+
+
+IRDSWM_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/irdswm.o": "./irdswm.f"
+	$(F77COMPILER) -o "$(OBJDIR)/irdswm.o" $(IRDSWM_F_11)  "./irdswm.f"
+
+
+SSVGRD_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/ssvgrd.o": "./ssvgrd.f"
+	$(F77COMPILER) -o "$(OBJDIR)/ssvgrd.o" $(SSVGRD_F_11)  "./ssvgrd.f"
+
+
+SRDSWM_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/srdswm.o": "./srdswm.f"
+	$(F77COMPILER) -o "$(OBJDIR)/srdswm.o" $(SRDSWM_F_11)  "./srdswm.f"
+
+
+SRDGRD_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/srdgrd.o": "./srdgrd.f"
+	$(F77COMPILER) -o "$(OBJDIR)/srdgrd.o" $(SRDGRD_F_11)  "./srdgrd.f"
+
+
+ROOTS_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/roots.o": "./roots.f"
+	$(F77COMPILER) -o "$(OBJDIR)/roots.o" $(ROOTS_F_11)  "./roots.f"
+
+
+ISVGRD_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/isvgrd.o": "./isvgrd.f"
+	$(F77COMPILER) -o "$(OBJDIR)/isvgrd.o" $(ISVGRD_F_11)  "./isvgrd.f"
+
+
+DBSCT_F_11 =   $(INCS) $(F77_FLAGS) $(F_DEFINES) 
+"$(OBJDIR)/dbsct.o": "./dbsct.f"
+	$(F77COMPILER) -o "$(OBJDIR)/dbsct.o" $(DBSCT_F_11)  "./dbsct.f"
+
+
+
+
+#
+#  Include any scanned dependencies
+#
+include "$(OUTDIR)/mkdep/mkdep_$(BASENAME).amk"
+
+
+#
+#  Define necessary macros for dependency scanning.
+#
+MKDEP=       makedepend
+MKDEP_FLAGS= -quiet "-pre$(OBJDIR)/" -Y -modInfo -errdel 
+

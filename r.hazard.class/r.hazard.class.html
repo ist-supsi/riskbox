@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>GRASS GIS: r.hazard.class</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="grassdocs.css" type="text/css">
+</head>
+<body bgcolor="white">
+
+<img src="grass_logo.png" alt="GRASS logo"><hr align=center size=6 noshade>
+
+<h2>NAME</h2>
+<em><b>r.hazard.class</b></em>  - Hazard classification of area maps
+<h2>KEYWORDS</h2>
+hazard, classification
+<h2>SYNOPSIS</h2>
+<b>r.hazard.class</b><br>
+<b>r.hazard.class help</b><br>
+<b>r.hazard.class</b> [-<b>c</b>] [-<b>s</b>] <b>low_int</b>=<em>string</em> <b>med_int</b>=<em>string</em> <b>high_int</b>=<em>string</em> <b>low_ub</b>=<em>value</em> <b>med_ub</b>=<em>value</em> <b>l_class</b>=<em>string</em> <b>m_class</b>=<em>string</em> <b>h_class</b>=<em>string</em> <b>t_class</b>=<em>string</em> [--<b>overwrite</b>]  [--<b>verbose</b>]  [--<b>quiet</b>] 
+
+<h3>Flags:</h3>
+<DL>
+<DT><b>-c</b></DT>
+<DD>Set color maps</DD>
+<DT><b>-s</b></DT>
+<DD>Set cautelative mode</DD>
+<DT><b>--overwrite</b></DT>
+<DD>Allow output files to overwrite existing files</DD>
+<DT><b>--verbose</b></DT>
+<DD>Verbose module output</DD>
+<DT><b>--quiet</b></DT>
+<DD>Quiet module output</DD>
+</DL>
+
+<h3>Parameters:</h3>
+<DL>
+<DT><b>low_int</b>=<em>string</em></DT>
+<DD>Intensity map name (low return period)</DD>
+
+<DT><b>med_int</b>=<em>string</em></DT>
+<DD>Intensity map name (medium return period)</DD>
+
+<DT><b>high_int</b>=<em>string</em></DT>
+<DD>Intensity map name (high return period)</DD>
+
+<DT><b>low_ub</b>=<em>value</em></DT>
+<DD>Lower intensity class upper boundary value</DD>
+
+<DT><b>med_ub</b>=<em>value</em></DT>
+<DD>Medium intensity class upper boundary value</DD>
+
+<DT><b>l_class</b>=<em>string</em></DT>
+<DD>Low return period hazard map name</DD>
+
+<DT><b>m_class</b>=<em>string</em></DT>
+<DD>Medium return period hazard map name</DD>
+
+<DT><b>h_class</b>=<em>string</em></DT>
+<DD>High return period hazard map name</DD>
+
+<DT><b>t_class</b>=<em>string</em></DT>
+<DD>Total hazard map classification name</DD>
+</DL>
+
+<h2>DESCRIPTION</h2>
+
+<p><em>r.hazard.class</em> allows to assess hazard maps according to the approach developed in Switzerland for natural hazards.
+(BUWAL 1999, OFAT, OFEE, OFEFP 1997, Raetzo et al. 2002).
+Two main aspects describe the level of hazard: intensity and return period. The intensity represents the magnitude of an
+event and is divided into three classes: high, medium and low. The return period, or probability, describe how often a hazard
+occurs and is also divided into three classes: low, medium and high.</p>
+<p>Input intensity maps (one for each probability class) are classified in hazard levels according to the intensity-probability
+codes represented in the matrix below:</p>
+<center>
+<img src=r.hazard.class.png border=0><br>
+<table border=0 width=700>
+<tr><td><center>
+<i>Hazard classification matrix</i>
+</center></td></tr>
+</table>
+</center>
+<p>As a default, if a cell contains two codes (e.g. medium intensity and low return period) the lower code is selected. If the user wants to apply a conservative approach and to select the higher codes it's possible to activate the flag <em>-s</em>.
+<p>Encoded maps are so integrated to obtain the final hazard map, where the increasing level of hazard is identified by the following
+codes:</p>
+<DT>0 = no hazard</DT>
+<DT>1 = low hazard</DT> 
+<DT>2 = medium hazard</DT>
+<p>If the flag <em>-c</em> is activated the hazard map is visualized with the colors represented in the matrix (no hazard areas are white). 
+
+
+<h2>NOTES</h2>
+
+<p>
+
+<p>
+
+
+<h2>AUTHORS</h2>
+
+M.Molinari, M.Cannata (IST-SUPSI, http://istgeo.ist.supsi.ch)
+
+<h2>REFERENCES</h2>
+
+<ul>
+  <li>BUWAL (1999) Risikoanalyse bei gravitativen Naturgefahren - Methode, Fallbeispiele und Daten (Risk analyses for gravitational natural hazards. Bundesamt fur Umwelt, Wald und Landschaft (BUWAL). Umwelt-Materialen Nr. 107, pp 1-244.</li>
+  <li>OFAT, OFEE, OFEFP 1997 : Prise en compte des dangers dus aux mouvements de terrain dans le cadre de l'amenagement du territoire (Consideration of Landslide Hazards in Land-use Practice). Recommandations. Office federal de l'amenagement du territoire (OFAT), Office federal de l'economie des eaux (OFEE), Office federal de l'environnement, des forets et du paysage (OFEFP), OCFIM Nr. 310.023f, Berne, Switzerland. (in French; German version also available). <a href ="http://www.bafu.admin.ch">www.bafu.admin.ch.</a></li>
+  <li>Raetzo H., Lateltin O., Bollinger D., Tripet J. P. (2002): Hazard assessment in Switzerland - Codes of Practice for mass movements. Bull. Eng. Geol. Env. (2002) Vol. 61, pp. 263-268.</li>
+</ul>
+
+
+<p><i>Last changed: $Date: 2008-05-16 12:09:06 -0700 (Fri, 16 May 2008) $</i>
+<HR>
+<P><a href="index.html">Main index</a> - <a href="raster.html">raster index</a> - <a href="full_index.html">Full index</a></P>
+<P>&copy; 2003-2008 <a href="http://grass.osgeo.org">GRASS Development Team</a></p>
+</body>
+</html>

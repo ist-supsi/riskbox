@@ -1,0 +1,412 @@
+#!/usr/bin/python
+# -*- coding:utf-8 -*-
+############################################################################
+#
+# MODULE:       v.pv
+#
+# AUTHOR(S):   Monia Molinari 
+#
+# PURPOSE:      
+#
+# COPYRIGHT:    (c) 2007 The GRASS Development Team
+#
+#               This program is free software under the GNU General Public
+#               License (>=v2). Read the file COPYING that comes with GRASS
+#               for details.
+#
+#############################################################################
+#%Module
+#%  description: 
+#%  keywords: 
+#%End
+#%Flag
+#% key: d
+#% description: calcolo dimensionamento
+#%End
+#%Flag
+#% key: e
+#% description: valutazione economica
+#%End
+#%option
+#%  key: catasto
+#%  type: string
+#%  gisprompt: old,vector,vector
+#%  description: layer del catasto
+#%  required : yes
+#%end
+#%option
+#% key: energia_incid
+#% type: string
+#% description: colonna del catasto con i valori di energia solare incidente su ogni edificio (kWh/anno)
+#% required : yes
+#%end
+#%option
+#%  key: eff1
+#%  type: double
+#%  description: efficienza pannello (%)
+#%  required : yes
+#%end
+#%option
+#%  key: eff2
+#%  type: double
+#%  description: efficienza impianto (%)
+#%  required : yes
+#%  answer: 80
+#%end
+#%option
+#% key: area
+#% type: string
+#% description: colonna del catasto con i valori delle aree degli edifici (mq)
+#% required : no
+#%end
+#%option
+#%  key: output
+#%  type: string
+#%  gisprompt: new,vector,vector
+#%  description: nome del vettore in output
+#%  required : yes
+#%end
+#%option
+#% key: consumo
+#% type: string
+#% description: colonna del catasto con i valori di consumo energetico (kWh/anno)
+#% required : yes
+#%  guisection: Dimensionamento
+#%end
+#%option
+#%  key: integrazione
+#%  type: double
+#%  description: percentuale d'integrazione (%)
+#%  required : yes
+#%  guisection: Dimensionamento
+#%end
+#%option
+#%  key: dim
+#%  type: double
+#%  description: superficie unitaria del modulo fotovoltaico (mq)
+#%  required : yes
+#%  guisection: Dimensionamento
+#%end
+#%option
+#%  key: P
+#%  type: double
+#%  description: massima potenza nominale del modulo (Wp)
+#%  required : yes
+#% guisection: Dimensionamento
+#%end
+#%Option
+#% key: tariffe_consumo
+#% type: string
+#% required: yes
+#% multiple: no
+#% key_desc: name
+#% description: file delle tariffe in base al consumo energetico
+#% gisprompt: old_file,file,input
+#% guisection: Valutazione economica
+#%End
+#%option
+#%  key: tariffe_incentivo
+#%  type: double
+#%  description: file delle tariffe incentivanti (euro/kWh prodotto)
+#% gisprompt: old_file,file,input
+#%  required : yes
+#% guisection: Valutazione economica
+#%end
+#%option
+#%  key:costo_impianto
+#%  type: double
+#%  description: costo unitario dell'impianto (euro/kWp)
+#%  required : yes
+#% guisection: Valutazione economica
+#%end
+#%option
+#%  key:IVA
+#%  type: double
+#%  description: IVA sul costo dell'impianto (%)
+#%  required : yes
+#%  answer: 10
+#% guisection: Valutazione economica
+#%end
+#%option
+#%  key: costi_esercizio
+#%  type: double
+#%  description: costi di esercizio (euro/anno)
+#%  required : no
+#% guisection: Valutazione economica
+#%end
+#%option
+#%  key:costi_manutenzione
+#%  type: double
+#%  description: costi di manutenzione (% annua rispetto al costo dell'impianto)
+#%  required : no
+#% guisection: Valutazione economica
+#%end
+#%option
+#%  key:copertura_assicurativa
+#%  type: double
+#%  description: costo di assicurazione dell'impianto (euro/kWp anno)
+#%  required : no
+#% guisection: Valutazione economica
+#%end
+#%option
+#%  key:vita_impianto
+#%  type: integer
+#%  description: vita tecnica di funzionamento dell'impianto (anni)
+#%  required : yes
+#%  answer: 25
+#% guisection: Valutazione economica
+#%end
+#%option
+#%  key:durata_incentivo
+#%  type: integer
+#%  description: numero di anni in cui si ha diritto agli incentivi
+#%  required : yes
+#%  answer: 20
+#% guisection: Valutazione economica
+#%end
+#%option
+#%  key:mix_elettrico
+#%  type: double
+#%  description: fattore di mix elettrico (KgCO2/kWh)
+#%  required : yes
+#%  answer: 0.531
+#% guisection: Valutazione economica
+#%end
+
+import os,sys,subprocess,string,random,math,tempfile,time
+
+def main(): 
+
+    energia_incid = os.getenv('GIS_OPT_energia_incid')
+    consumo = os.getenv('GIS_OPT_consumo')
+    catasto = os.getenv('GIS_OPT_catasto')
+    eff1 = float(os.getenv('GIS_OPT_eff1'))
+    eff2 = float(os.getenv('GIS_OPT_eff2'))
+    area = os.getenv('GIS_OPT_area')
+    d = os.getenv('GIS_FLAG_d')
+    e = os.getenv('GIS_FLAG_e')
+    output = os.getenv('GIS_OPT_output')
+
+    
+    cmdargs1= ["vect=%s,%s"%(catasto,output),"--quiet"]
+    os.spawnvp(os.P_WAIT,"g.copy", ["g.copy"] + cmdargs1)
+
+    cmdargs11=["db.columns","table=%s" %output]
+    proc11 = subprocess.Popen(cmdargs11, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    list_col = proc11.communicate()[0].split('\n')
+
+    for a in (list_col):
+        if a!="":
+            if (a!='%s'%area)and (a!='%s'%energia_incid)and(a!='CAT')and (a!='consumo'):
+                cmdargs111 = ["map=%s"%output, "column=%s"%a]         
+                os.spawnvp(os.P_WAIT,"v.db.dropcol", ["v.db.dropcol"] + cmdargs111)            
+
+    opt_name = "%s"%area
+    if (len(opt_name)==0):
+
+        cmdargs2 = ["map=%s"%output,'columns=area DOUBLE',"--quiet"]
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs2)
+
+        cmdargs3 = ["map=%s"%output,"option=area","column=area","units=meters","--quiet"]
+        os.spawnvp(os.P_WAIT,"v.to.db", ["v.to.db"] + cmdargs3)
+
+    Eff= (eff1/100)*(eff2/100)    
+
+    cmdargs6 = ["map=%s"%output,'columns=en_media DOUBLE']
+    os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs6) 
+
+    if (len(opt_name)==0):
+
+        cmdargs7 = ["map=%s"%output,"column=en_media","value=%s/area"%energia_incid]
+        os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs7)   
+        
+    else:
+        cmdargs77 = ["map=%s"%output,"column=en_media","value=%s/%s"%(energia_incid,area)]
+        os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs77)     
+
+
+    cmdargs8 = ["map=%s"%output,'columns=en_fornita DOUBLE']
+    os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs8)     
+
+    cmdargs9 = ["map=%s"%output,"column=en_fornita","value=en_media*%s"%Eff]
+    os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs9)  
+
+
+    if (('%s'%e=='1')and('%s'%d=='0')):
+        print "Per calcolare la valutazione economica è necessario il dimensionamento!"
+        sys.exit(1)
+
+
+
+    #### DIMENSIONAMENTO ####
+
+    if ('%s'%d=='1'):
+
+        integrazione = float(os.getenv('GIS_OPT_integrazione'))
+        consumo = os.getenv('GIS_OPT_consumo')
+        dim = float(os.getenv('GIS_OPT_dim'))
+        P = float(os.getenv('GIS_OPT_P'))
+
+        cmdargs101 = ["map=%s"%output,'columns=en_prod DOUBLE']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs101) 
+
+        integ=integrazione/100
+
+        cmdargs102 = ["map=%s"%output,"column=en_prod","value=(%s*%s)"%(integ,consumo)]
+        os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs102) 
+
+        
+        cmdargs10 = ["map=%s"%output,'columns=mq_impiant DOUBLE']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs10)   
+
+        cmdargs11 = ["map=%s"%output,"column=mq_impiant","value=en_prod/en_fornita"]
+        os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs11)        
+ 
+
+        cmdargs12 = ["map=%s"%output,'columns=n_moduli INT']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs12)
+
+        cmdargs13 = ["map=%s"%output,"column=n_moduli","value=(mq_impiant/%s)+1"%dim]
+        os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs13)          
+  
+        cmdargs14 = ["map=%s"%output,'columns=P_picco DOUBLE']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs14)
+
+        cmdargs15 = ["map=%s"%output,"column=P_picco","value=(n_moduli*%s)/1000"%P]
+        os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs15)        
+
+
+
+
+        ##### VALUTAZIONE ECONOMICA ####
+
+
+    if ('%s'%e=='1'):
+        tariffe_incentivo = os.getenv('GIS_OPT_tariffe_incentivo')
+        tariffe_consumo = os.getenv('GIS_OPT_tariffe_consumo')
+        c_impianto = float(os.getenv('GIS_OPT_costo_impianto'))
+        IVA = float(os.getenv('GIS_OPT_IVA'))
+        vita_impianto = int(os.getenv('GIS_OPT_vita_impianto'))
+        durata_incentivo = int(os.getenv('GIS_OPT_durata_incentivo'))
+        cop_ass = os.getenv('GIS_OPT_copertura_assicurativa')
+        mix_elettrico = float(os.getenv('GIS_OPT_mix_elettrico'))
+
+        if(len(cop_ass)>0):
+            copertura_assicurativa = float(cop_ass)
+        else:
+            copertura_assicurativa = 0
+
+        c_eser = os.getenv('GIS_OPT_costi_esercizio')
+        if(len(c_eser)>0):
+            costi_esercizio = float (c_eser)
+        else:
+            costi_esercizio = 0
+
+        c_man = os.getenv('GIS_OPT_costi_manutenzione')
+        if(len(c_man)>0):
+            costi_manutenzione = float (c_man)
+        else:
+            costi_manutenzione = 0
+
+
+        cmdargs18 = ["map=%s"%output,'columns=tariffa1 DOUBLE']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs18)
+
+        cmdargs19 = ["map=%s"%output,'columns=tariffa2 DOUBLE']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs19)
+
+        f = open ("%s"%tariffe_consumo,"r")
+        for line in f.readlines():
+            s = line.split(' ')[0]
+            a = s.split(':')[0]     
+            b = s.split(':')[1]
+            c = line.split(' ')[1]
+            cc = float(c)
+  
+            cmdargs20 = ["map=%s"%output,'column=tariffa1',"value='%s'"%cc, "where=%s>%s and %s<%s"%(consumo,a,consumo,b)]
+            os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs20)
+
+            cmdargs21 = ["map=%s"%output,'column=tariffa2',"value='%s'"%cc, "where=(%s-en_prod)>%s and (%s-en_prod)<%s"%(consumo,a,consumo,b)]
+            os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs21)
+
+   
+        cmdargs188 = ["map=%s"%output,'columns=tariffa3 DOUBLE']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs188)
+
+         
+        g = open ("%s"%tariffe_incentivo,"r")
+        for line in g.readlines():
+            s = line.split(' ')[0]
+            a = s.split(':')[0] 
+            aa = float(a)    
+            b = s.split(':')[1]
+            bb = float(b)
+            c = line.split(' ')[1]
+            cc = float(c)
+
+ 
+            cmdargs200 = ["map=%s"%output,'column=tariffa3',"value='%s'"%cc, "where=P_picco>%s and P_picco<=%s"%(aa,bb)]
+            os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs200)
+
+
+        cmdargs16 = ["map=%s"%output,'columns=incentivo DOUBLE']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs16)
+        
+        cmdargs17 = ["map=%s"%output,"column=incentivo","value=(%s*%s*tariffa3)"%(integ,consumo)]
+        os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs17)  
+
+        cmdargs22 = ["map=%s"%output,'columns=risparmio DOUBLE']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs22)
+
+        cmdargs23 = ["map=%s"%output,"column=risparmio","value=(consumo*tariffa1)-((consumo-en_prod)*tariffa2)-%s"%costi_esercizio]
+        os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs23) 
+      
+        if(len(c_man)>0):
+            cmdargs26 = ["map=%s"%output,'columns=c_man DOUBLE']
+            os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs26) 
+
+            cmdargs27 = ["map=%s"%output,"column=c_man","value=(%s/100*(P_picco*%s))"%(costi_manutenzione,c_impianto)]
+            os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs27) 
+
+        if(len(cop_ass)>0):
+            cmdargs28 = ["map=%s"%output,'columns=c_ass DOUBLE']
+            os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs28) 
+
+            cmdargs29 = ["map=%s"%output,"column=c_ass","value=%s*P_picco"%(copertura_assicurativa)]
+            os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs29)          
+
+        cmdargs24 = ["map=%s"%output,'columns=c_imp DOUBLE']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs24)   
+
+        cmdargs25 = ["map=%s"%output,"column=c_imp","value=P_picco*%s+(P_picco*%s*%s/100)"%(c_impianto,c_impianto,IVA)]
+        os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs25)   
+
+        cmdargs26 = ["map=%s"%output,'columns=pay_back DOUBLE']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs26)
+
+        cmdargs27 = ["map=%s"%output,"column=pay_back","value=c_imp/(incentivo+risparmio-c_ass-c_man)"]
+        os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs27)
+
+        cmdargs28 = ["map=%s"%output,'columns=guad_eco DOUBLE']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs28)    
+
+        cmdargs29 = ["map=%s"%output,"column=guad_eco","value=(incentivo*%s)+(risparmio*%s)-c_imp-c_ass*%s-c_man*%s"%(durata_incentivo,vita_impianto,vita_impianto,vita_impianto)]
+        os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs29)
+
+        cmdargs30 = ["map=%s"%output,'columns=guad_amb DOUBLE']
+        os.spawnvp(os.P_WAIT,"v.db.addcol", ["v.db.addcol"] + cmdargs30)  
+
+        cmdargs29 = ["map=%s"%output,"column=guad_amb","value=en_prod*%s*%s"%(mix_elettrico,vita_impianto)]
+        os.spawnvp(os.P_WAIT,"v.db.update", ["v.db.update"] + cmdargs29)
+
+
+
+    return
+
+if __name__ == "__main__":
+    if ( len(sys.argv) <= 1 or sys.argv[1] != "@ARGS_PARSED@" ):
+        os.execvp("g.parser", [sys.argv[0]] + sys.argv)
+    else:
+	main();    
+
+

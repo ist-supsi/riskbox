@@ -1,0 +1,28 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<h2>DESCRIPTION</h2>
+
+<p><em>r.massmov.calibration</em> is developed for automating and simplifying <em>r.massmov</em> model calibration procedure.</p>
+<p>The module requires all the <em>r.massmov</em> mandatory inputs. Rheological numerical parameters must be expressed as a range and variation step <em>(min:max:step)</em> or as a list of comma separated values <em>(val,val,val,...)</em>. 
+<em>r.massmov</em> optional inputs for automatic stopping criterion (<em>step_thres</em> and <em>stop_thres</em>) and parallel computing (<em>threads</em>) are also available.</p>
+Based on input data, the module runs a series of simulations combining all the different values of considered parameters.The possible outputs are:
+<ul> 
+<li> final deposit maps (<em>h</em>+simulation code), optionally based on the same user-defined color table (<em>color_rules</em>);</li>
+<li> a report (<em>outfile</em>) with basic information (for each simulation: simulation code, used parameters, time length, number of time steps) and other optional statistics (<em>-msc</em>), calculated with respect to the observation map;</li>
+<li> one or more text files (for each simulation) with coordinates and deposit values along user-defined profiles.</li>
+</ul> 
+<h2>NOTES</h2>
+Currently the module is available only for Voellmy rheologies.
+
+<h2>REFERENCES</h2>
+Molinari M, Cannata M, Begueria S and Ambrosi C 2012 GIS-based Calibration of MassMov2D. Transactions in GIS, 2012, 16(2):215-231
+
+<h2>SEE ALSO</h2>
+<em>r.massmov, r.massmov.calibration, r.ucode</em>
+
+
+
+<h2>AUTHORS</h2>
+Monia Molinari, Massimiliano Cannata 
+<br>Institute of Earth Sciences, University of Applied Sciences and Arts of Southern Switzerland
+
+<p><i>Last changed: $Date: 2012-09-28 14:14:30 +0200 (Fri, 28 Sep 2012) $</i>

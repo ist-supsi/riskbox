@@ -1,0 +1,160 @@
+#!/usr/bin/python
+# -*- coding:utf-8 -*-
+############################################################################
+#
+# MODULE:       r.sun.mean
+#
+# AUTHOR(S):    M.Molinari
+#
+# PURPOSE:      Calculation of global and mean annual solar radiation
+#
+# COPYRIGHT:    (c) 2007 The GRASS Development Team
+#
+#               This program is free software under the GNU General Public
+#               License (>=v2). Read the file COPYING that comes with GRASS
+#               for details.
+#
+############################################################################
+#%Module
+#%  description: Calculation of global and mean annual solar radiation
+#%  keywords: radiation, mean
+#%End
+#%Flag
+#% key: m
+#% description: raster mean value of solar radiation per month
+#%End
+#%Flag
+#% key: y
+#% description: raster mean value of solar radiation per year
+#%End
+#%option
+#%  key: elevin
+#%  type: string
+#% required: yes
+#% multiple: no
+#%  gisprompt: old,cell,raster
+#%  description: Digital Terrain Model
+#%  required : yes
+#%end
+#%Option
+#% key: aspin
+#% type: string
+#% required: yes
+#% multiple: no
+#% description: Name of the input aspect map
+#% gisprompt: old,cell,raster
+#%End
+#%Option
+#% key: slopein
+#% type: string
+#% required: yes
+#% multiple: no
+#% description: Name of the input slope raster map
+#% gisprompt: old,cell,raster
+#%End
+#%Option
+#% key: albedo
+#% type: string
+#% required: no
+#% multiple: no
+#% description: Name of the ground albedo coefficient input raster map [-]
+#% gisprompt: old,cell,raster
+#%End
+#%Option
+#% key: linkein
+#% type: string
+#% required: no
+#% multiple: no
+#% description: suffix linke raster (suffix.Jan is the base name for linke raster)
+#%End
+
+
+import os,sys,subprocess,string,random,math,tempfile,time
+
+def main():
+
+    elevin= os.getenv('GIS_OPT_elevin')
+    aspin= os.getenv('GIS_OPT_aspin')
+    slopein= os.getenv('GIS_OPT_slopein')
+    linkein= os.getenv('GIS_OPT_linkein')
+    albedo= os.getenv('GIS_OPT_albedo')
+    m = os.getenv('GIS_FLAG_m')
+    y = os.getenv('GIS_FLAG_y')
+
+    ### check linke map exixting ###
+ 
+    MONTH_NAME=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    RANGE_MONTH=range(0,12)
+
+    for i in RANGE_MONTH:    
+        b=MONTH_NAME[i]
+        cmdargs1 = ["g.mlist","type=rast","pattern=%s.%s"%(linkein,b)]
+        proc1 = subprocess.Popen(cmdargs1, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        result = proc1.communicate()[0].split("\n")[0]
+        check= str(result)
+
+        if check!="%s.%s"%(linkein,b):
+            print "%s.%s not found!"%(linkein,b)
+            sys.exit(1)
+
+      
+
+    MONTH_LENGTH=[31,28,31,30,31,30,31,31,30,31,30,31]
+    MONTH_START=[1,32,60,91,121,152,182,213,244,274,305,335]
+    cmdargs1=["sum_year=0"]
+    os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs1)
+
+    for i in RANGE_MONTH:
+        a=MONTH_LENGTH[i]
+        b=MONTH_NAME[i]
+        c=MONTH_START[i]
+        MAX_DAY=range(c,c+a)
+        print "Month:%s"%MONTH_NAME[i]
+        print "Number of days:%s"%MONTH_LENGTH[i]
+        
+        cmdargs1=["sum_%s=0"%b]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs1)
+
+        cmdargs11=["time_%s=0"%b]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs11)
+
+        for j in MAX_DAY:
+
+            cmdargs2= ["day=%s"%j,"elevin=%s"%elevin,"aspin=%s"%aspin,"slopein=%s"%slopein,"linkein=%s.%s"%(linkein,b),"albedo=%s"%albedo,"beam_rad=dir","diff_rad=diff","refl_rad=refl","insol_time=time","-s","--o"]
+            os.spawnvp(os.P_WAIT,"r.sun", ["r.sun"] + cmdargs2)
+        
+            print "day %s completed!"%j
+
+            cmdargs3=["sum_%s=sum_%s+dir+diff+refl"%(b,b)]
+            os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs3)
+
+            cmdargs33=["time_%s=time_%s+time"%(b,b)]
+            os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs33)  
+         
+            print "sum of day %s completed!"%j
+
+        if ('%s'%m=='1'):
+            cmdargs6=["mean_%s=sum_%s/%s"%(b,b,a)]
+            os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs6) 
+            print "raster mean value of %s calculated!"%b           
+
+        cmdargs5=["sum_year=sum_year+sum_%s"%b]   
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs5)
+        print "sum of month %s completed!"%b
+
+    
+
+    if ('%s'%y=='1'):       
+        cmdargs7=["mean_year=sum_year/365"]
+        os.spawnvp(os.P_WAIT,"r.mapcalc", ["r.mapcalc"] + cmdargs7) 
+        print "raster mean value of year calculated!"     
+    
+
+  
+    return
+
+if __name__ == "__main__":
+    if ( len(sys.argv) <= 1 or sys.argv[1] != "@ARGS_PARSED@" ):
+        os.execvp("g.parser", [sys.argv[0]] + sys.argv)
+    else:
+	main();

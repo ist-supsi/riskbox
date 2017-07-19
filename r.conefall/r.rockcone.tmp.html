@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>GRASS GIS: r.rockcone</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="grassdocs.css" type="text/css">
+</head>
+<body bgcolor="white">
+
+<img src="grass_logo.png" alt="GRASS logo"><hr align=center size=6 noshade>
+
+<h2>NAME</h2>
+<em><b>r.rockcone</b></em>  - Estimate the area potentially affected by gravitative falls
+<h2>KEYWORDS</h2>
+raster, rockfall
+<h2>SYNOPSIS</h2>
+<b>r.rockcone</b><br>
+<b>r.rockcone help</b><br>
+<b>r.rockcone</b> <b>elev</b>=<em>string</em> <b>aspect</b>=<em>string</em> <b>start</b>=<em>string</em> <b>deg</b>=<em>float</em>  [<b>dir</b>=<em>integer</em>]   [<b>fv</b>=<em>string</em>]   [<b>mass</b>=<em>string</em>]   [<b>freq</b>=<em>string</em>]   [<b>vel</b>=<em>string</em>]   [<b>ecin</b>=<em>string</em>]   [<b>method</b>=<em>max|ave|min</em>]   [--<b>overwrite</b>]  [--<b>verbose</b>]  [--<b>quiet</b>] 
+
+<h3>Flags:</h3>
+<DL>
+<DT><b>--overwrite</b></DT>
+<DD>Allow output files to overwrite existing files</DD>
+<DT><b>--verbose</b></DT>
+<DD>Verbose module output</DD>
+<DT><b>--quiet</b></DT>
+<DD>Quiet module output</DD>
+</DL>
+
+<h3>Parameters:</h3>
+<DL>
+<DT><b>elev</b>=<em>string</em></DT>
+<DD>Name of elevation raster map</DD>
+
+<DT><b>aspect</b>=<em>string</em></DT>
+<DD>Name of aspect raster map</DD>
+
+<DT><b>start</b>=<em>string</em></DT>
+<DD>Name of input starting cells raster map</DD>
+
+<DT><b>deg</b>=<em>float</em></DT>
+<DD>Degree of cone inclination from the horizont [0&lt;x&lt;90]</DD>
+<DD>Default: <em>35</em></DD>
+
+<DT><b>dir</b>=<em>integer</em></DT>
+<DD>Degree of direction angle range [0&lt;x&lt;360]</DD>
+<DD>Default: <em>90</em></DD>
+
+<DT><b>fv</b>=<em>string</em></DT>
+<DD>Velocity factor reduction [0&lt;x&lt;1]</DD>
+<DD>Default: <em>0.9</em></DD>
+
+<DT><b>mass</b>=<em>string</em></DT>
+<DD>Mean block mass [Kg]</DD>
+
+<DT><b>freq</b>=<em>string</em></DT>
+<DD>Output frequency raster map</DD>
+
+<DT><b>vel</b>=<em>string</em></DT>
+<DD>Output velocity raster map</DD>
+
+<DT><b>ecin</b>=<em>string</em></DT>
+<DD>Output kinetic energy raster map</DD>
+
+<DT><b>method</b>=<em>max|ave|min</em></DT>
+<DD>Method for cones velocity and energy aggregation</DD>
+<DD>Options: <em>max,ave,min</em></DD>
+<DD>Default: <em>max</em></DD>
+
+</DL>
+<HR>
+<P><a href="index.html">Main index</a> - <a href="raster.html">raster index</a> - <a href="full_index.html">Full index</a></P>
+<P>&copy; 2003-2008 <a href="http://grass.osgeo.org">GRASS Development Team</a></p>
+</body>
+</html>
